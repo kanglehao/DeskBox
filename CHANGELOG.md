@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.5.10 - 2026-10-16
+
+### English
+
+#### New features
+
+- Every member of a widget group is visible at once. The group title used to show only part of the member names, with the rest reachable by scrolling; members now share one row of equal-width tabs sized to the available space, long names truncate, and the Tabs and Stack navigation styles render the same way.
+- Group tabs are colour-coded. Each member gets a stable tint derived from its identity, so members read as distinct chips; in narrow widgets the unused icon slot yields to the text, so names are no longer squeezed down to a few characters.
+- A new "Frequency" sort mode orders widget items by how often they have been opened. The count is recorded when an item opens and persists across restarts.
+- New search entry points. A search button on the main window title bar and a "Search" item in the tray menu open the existing search popup, so the global hotkey is no longer the only way in.
+- Removed the in-app update detection and prompts: the update service, its background check, the tray and popup update notices, and the Settings update cards are gone. DeskBox is updated by installing a newer package; the About page still shows the version and feedback entries.
+
+#### Fixes
+
+- Bracket-safe path handling in the native AOT publish scripts. With square brackets in the repository path, PowerShell resolved them as wildcard syntax, so the retail publish failed at directory creation and could not write its log; directories are now created through the .NET API and logs are written with `Add-Content -LiteralPath`.
+
+### 中文
+
+#### 新功能
+
+- 组合格子一次显示全部成员标题。组合标题此前只显示部分成员名称、其余靠滚动选择；现在所有成员共用一排等宽标签，按可用空间自适应铺满，超长名称截断，Tabs 与 Stack 两种导航样式表现一致。
+- 组合标签彩色区分。每个成员按自身身份获得稳定色块，成员之间一眼可分；窄宽度下未使用的图标槽让位给文字，名称不再被挤到只剩几个字符。
+- 新增「使用次数」排序。格子内项目可按被打开的次数排序；计数在打开项目时记录，并跨重启保留。
+- 新增搜索入口。主窗口标题栏的搜索按钮与托盘菜单的「搜索」项均可打开现有搜索弹窗，不再只依赖全局热键。
+- 移除应用内升级检测与提示。更新服务、后台检查、托盘与弹窗更新提示、设置页更新卡片全部移除，升级改为安装新安装包；「关于」页仍显示版本号与反馈入口。
+
+#### 修复
+
+- 原生 AOT 发布脚本的方括号路径处理。仓库路径含方括号时，PowerShell 会按通配符解析，导致零售发布在建目录与写日志时失败；现在目录改用 .NET API 创建，日志改用 `Add-Content -LiteralPath` 写入。
+
 ## 1.5.8 - 2026-10-14
 
 ### English

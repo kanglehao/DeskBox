@@ -7,7 +7,7 @@
 > 目前暂不接受外部 PR 合并——欢迎通过 Issue / Discussion 提交 Bug、功能建议与技术讨论，详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 [![CI](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml)
-[![1.5.8 版本](https://img.shields.io/badge/release-1.5.8-2563EB.svg)](https://github.com/Tianyu199509/DeskBox/releases/tag/v1.5.8)
+[![1.5.10 版本](https://img.shields.io/badge/release-1.5.10-2563EB.svg)](https://github.com/kanglehao/DeskBox/releases/tag/v1.5.10)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%2F11-0078D4.svg)](#环境要求)
 [![x64 and ARM64](https://img.shields.io/badge/architecture-x64%20%7C%20ARM64-5C2D91.svg)](#下载)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
@@ -41,14 +41,17 @@ DeskBox 使用贴近 Windows 原生体验的材质，同时保留普通桌面文
 
 ## 下载
 
-DeskBox 1.5.8 已进入发版准备阶段。下方 [GitHub Releases](https://github.com/Tianyu199509/DeskBox/releases/tag/v1.5.8) 下载链接会在正式发布后生效。
+DeskBox 1.5.10 已发布。
 
-- [DeskBox 1.5.8 x64 安装包](https://github.com/Tianyu199509/DeskBox/releases/download/v1.5.8/DeskBox_Setup_1.5.8_x64.exe)，推荐大多数 Intel 和 AMD 电脑使用。
-- [DeskBox 1.5.8 ARM64 安装包](https://github.com/Tianyu199509/DeskBox/releases/download/v1.5.8/DeskBox_Setup_1.5.8_arm64.exe)，推荐骁龙、Surface Pro X 等 Windows on ARM 电脑使用。
+- [DeskBox 1.5.10 x64 安装包](https://github.com/kanglehao/DeskBox/releases/download/v1.5.10/DeskBox_Setup_1.5.10_x64.exe)，推荐大多数 Intel 和 AMD 电脑使用。
 
-两个安装包都是 Full Native AOT 构建，并内置对应架构的私有 Windows App Runtime 2.5.1，可离线安装，不需要另外下载 .NET 10 或 Windows App Runtime。
+本定制版目前只提供 x64 安装包。
 
-每个安装包都提供同名的 `.sha256` 校验文件。代码签名已接入 SignPath：自生产证书签发后的首个发布版本起，安装包由 SignPath Foundation 签发；在此之前介意者请在运行前核对哈希。详见[代码签名策略](docs/code-signing.md)。
+安装包为 Full Native AOT 构建，并内置对应架构的私有 Windows App Runtime 2.5.1，可离线安装，不需要另外下载 .NET 10 或 Windows App Runtime。运行前请核对哈希：
+
+```text
+782F2F1EE73AC8CC5312EDBB1874D872630B3123F8A84F4E9AA580F6C1512F84  DeskBox_Setup_1.5.10_x64.exe
+```
 
 > DeskBox 本体默认安装到当前用户目录。
 
@@ -129,6 +132,16 @@ DeskBox 1.5.8 已进入发版准备阶段。下方 [GitHub Releases](https://git
 - 支持设置本地备份与恢复；待办、随记和格子样式还可定时备份到你自己的 WebDAV 服务器——密码保存在 Windows 凭据管理器，每个数据域独立开关，远端快照可浏览、可按合并或完全恢复两种模式还原。
 - 可导出经过隐私过滤的一键诊断包用于排查问题。
 - 设置使用可恢复快照，退出时刷新待保存内容；保存失败会明确记录和提示，不再静默恢复默认配置。
+
+## 1.5.10 更新亮点
+
+- **组合成员一次全部可见。** 此前成员较多的组合只能显示部分名称、其余靠滚动选择；现在所有成员共用一排等宽标签，按可用空间自适应铺满，超长名称截断，Tabs 与 Stack 两种导航样式表现一致。
+- **标签彩色区分、文字看得清。** 每个成员按自身身份获得稳定色块，成员之间一眼可分，不再是连成一片的灰条；窄宽度下未使用的图标槽让位给文字，名称不再被挤到只剩几个字符。
+- **按使用次数排序。** 新增「使用次数」排序模式，按被打开的次数排列格子内项目；计数在打开项目时记录，并跨重启保留。
+- **标题栏与托盘搜索入口。** 主窗口标题栏新增搜索按钮，托盘右键菜单新增「搜索」项，都可直接打开现有搜索弹窗，不再只依赖全局热键。
+- **移除升级检测与提示。** 应用内更新检查、后台检查、托盘与弹窗更新提示、设置页更新卡片全部移除，升级改用安装新安装包的方式；「关于」页仍显示版本号与反馈入口。
+
+完整内容见 [更新日志](CHANGELOG.md) 和 [1.5.10 发布说明](docs/releases/v1.5.10.md)。
 
 ## 1.5.8 更新亮点
 
@@ -262,8 +275,8 @@ ISCC.exe /DDeskBoxNativeAot=1 /DDeskBoxBundledRuntime=1 /DMyAppReleaseDir=..\.ar
 预期输出：
 
 ```text
-Output\DeskBox_Setup_1.5.8_x64.exe
-Output\DeskBox_Setup_1.5.8_arm64.exe
+Output\DeskBox_Setup_1.5.10_x64.exe
+Output\DeskBox_Setup_1.5.10_arm64.exe
 ```
 
 ## 项目结构

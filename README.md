@@ -7,7 +7,7 @@ English | [简体中文](README.zh-CN.md)
 > External pull requests are not being merged at this time — bug reports, ideas, and discussions are very welcome via Issues / Discussions. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 [![CI](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml)
-[![Release 1.5.8](https://img.shields.io/badge/release-1.5.8-2563EB.svg)](https://github.com/Tianyu199509/DeskBox/releases/tag/v1.5.8)
+[![Release 1.5.10](https://img.shields.io/badge/release-1.5.10-2563EB.svg)](https://github.com/kanglehao/DeskBox/releases/tag/v1.5.10)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%2F11-0078D4.svg)](#system-requirements)
 [![x64 and ARM64](https://img.shields.io/badge/architecture-x64%20%7C%20ARM64-5C2D91.svg)](#download)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
@@ -41,14 +41,17 @@ All twelve selectable languages share the same resource-key and formatting-place
 
 ## Download
 
-DeskBox 1.5.8 is prepared for release. The [GitHub Releases](https://github.com/Tianyu199509/DeskBox/releases/tag/v1.5.8) download links below will become available after publication.
+DeskBox 1.5.10 is available now.
 
-- [DeskBox 1.5.8 for x64](https://github.com/Tianyu199509/DeskBox/releases/download/v1.5.8/DeskBox_Setup_1.5.8_x64.exe), recommended for most Intel and AMD PCs.
-- [DeskBox 1.5.8 for ARM64](https://github.com/Tianyu199509/DeskBox/releases/download/v1.5.8/DeskBox_Setup_1.5.8_arm64.exe), recommended for Snapdragon, Surface Pro X, and other Windows on ARM PCs.
+- [DeskBox 1.5.10 for x64](https://github.com/kanglehao/DeskBox/releases/download/v1.5.10/DeskBox_Setup_1.5.10_x64.exe), recommended for most Intel and AMD PCs.
 
-Both packages are Full Native AOT builds with the matching private Windows App Runtime 2.5.1, so they can install offline without downloading a separate .NET 10 or Windows App Runtime package.
+This customized build ships the x64 installer only.
 
-Every release publishes a matching `.sha256` sidecar for each installer. Code signing is integrated via SignPath: starting with the first release published after the production certificate is issued, installers are signed by the SignPath Foundation; until then, verify the hash before running an installer. See the [code signing policy](docs/code-signing.md) for details.
+The package is a Full Native AOT build with the matching private Windows App Runtime 2.5.1, so it can install offline without downloading a separate .NET 10 or Windows App Runtime package. Verify the hash before running it:
+
+```text
+782F2F1EE73AC8CC5312EDBB1874D872630B3123F8A84F4E9AA580F6C1512F84  DeskBox_Setup_1.5.10_x64.exe
+```
 
 > DeskBox itself installs for the current user by default.
 
@@ -129,6 +132,16 @@ Every release publishes a matching `.sha256` sidecar for each installer. Code si
 - Back up and restore settings locally, or back up todos, quick captures, and widget styles to your own WebDAV server on a schedule; passwords live in Windows Credential Manager, each data domain toggles independently, and remote snapshots can be browsed and restored in merge or snapshot-faithful mode.
 - Export a privacy-filtered diagnostics package for troubleshooting.
 - Recover settings from resilient snapshots, flush pending changes during shutdown, and report save failures instead of silently reverting to defaults.
+
+## What's new in 1.5.10
+
+- **Every group member is visible at once.** A crowded group used to show only part of its member names, with the rest reachable by scrolling. Members now share one row of equal-width tabs sized to the available space, long names truncate, and the Tabs and Stack navigation styles render the same way.
+- **Colour-coded, readable tabs.** Each member gets a stable tint derived from its identity, so members read as distinct chips instead of one continuous strip. In narrow widgets the unused icon slot yields to the text, so names are no longer squeezed down to a few characters.
+- **Sort a widget by usage.** A new "Frequency" sort mode orders items by how often you have opened them; the count is recorded when an item opens and persists across restarts.
+- **Search from the title bar and the tray.** A search button on the main window title bar and a "Search" item in the tray menu open the existing search popup, so the global hotkey is no longer the only way in.
+- **Update prompts removed.** In-app update checks, background checks, tray and popup update notices, and the Settings update cards are gone; DeskBox is updated by installing a newer package. The About page still shows the version and feedback entries.
+
+Read the complete [changelog](CHANGELOG.md) or the [1.5.10 release notes](docs/releases/v1.5.10.md).
 
 ## What's new in 1.5.8
 
@@ -264,8 +277,8 @@ ISCC.exe /DDeskBoxNativeAot=1 /DDeskBoxBundledRuntime=1 /DMyAppReleaseDir=..\.ar
 Expected outputs:
 
 ```text
-Output\DeskBox_Setup_1.5.8_x64.exe
-Output\DeskBox_Setup_1.5.8_arm64.exe
+Output\DeskBox_Setup_1.5.10_x64.exe
+Output\DeskBox_Setup_1.5.10_arm64.exe
 ```
 
 ## Project layout
