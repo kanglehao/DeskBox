@@ -19,7 +19,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $manifestPath = Join-Path $repoRoot "native\Cargo.toml"
 $targetTriple = if ($Platform -eq "ARM64") {
     "aarch64-pc-windows-msvc"
@@ -120,7 +120,7 @@ if (-not $ValidateOnly.IsPresent) {
             $encodedRustFlags,
             "Process")
         [Environment]::SetEnvironmentVariable("RUSTFLAGS", $null, "Process")
-        Push-Location $repoRoot
+        Push-Location -LiteralPath $repoRoot
         try {
             & $cargo @cargoArguments
             if ($LASTEXITCODE -ne 0) {
@@ -144,7 +144,9 @@ if (-not $ValidateOnly.IsPresent) {
     }
 
     $cargoOutput = Join-Path $cargoTargetRoot "$targetTriple\$cargoProfile"
-    New-Item -ItemType Directory -Path $outputRoot -Force | Out-Null
+    # PowerShell's New-Item treats the '[' and ']' in the repository path as
+    # wildcard syntax, so create the directory through the .NET API.
+    [System.IO.Directory]::CreateDirectory($outputRoot) | Out-Null
     foreach ($artifactName in $requiredArtifacts) {
         $sourcePath = Join-Path $cargoOutput $artifactName
         if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {

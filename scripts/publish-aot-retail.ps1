@@ -253,8 +253,11 @@ Assert-PathInsideRoot -Root $artifactRoot -Candidate $runRoot
 if (Test-Path -LiteralPath $runRoot -PathType Container) {
     Remove-Item -LiteralPath $runRoot -Recurse -Force
 }
-New-Item -ItemType Directory -Path $publishDir -Force | Out-Null
-New-Item -ItemType Directory -Path $symbolsDir -Force | Out-Null
+# The repository path contains '[' and ']' characters, which PowerShell's
+# New-Item would treat as wildcard syntax, so create the directories through
+# the .NET API instead of resolving the path as a PowerShell provider path.
+[System.IO.Directory]::CreateDirectory($publishDir) | Out-Null
+[System.IO.Directory]::CreateDirectory($symbolsDir) | Out-Null
 
 $commonProperties = @(
     "-p:Platform=$Platform",
@@ -285,7 +288,14 @@ try {
             "--artifacts-path", $buildArtifactsDir,
             "-v:minimal"
         ) + $commonProperties
-        & $dotnet @restoreArguments 2>&1 | Tee-Object -FilePath $logPath -Append
+        & $dotnet @restoreArguments 2>&1 | ForEach-Object {
+            # Tee-Object only accepts -FilePath, which resolves the bracket
+            # characters in the repository path as wildcard syntax. Add-Content
+            # supports -LiteralPath, so tee through it while still emitting the
+            # line to the pipeline for CI logs.
+            Add-Content -LiteralPath $logPath -Value $_
+            $_
+        }
         if ($LASTEXITCODE -ne 0) {
             throw "AOT retail restore failed for '$restoreProject'. See '$logPath'."
         }
@@ -303,7 +313,12 @@ try {
         "-p:PublishSingleFile=false",
         "-v:minimal"
     ) + $commonProperties
-    & $dotnet @publishArguments 2>&1 | Tee-Object -FilePath $logPath -Append
+    & $dotnet @publishArguments 2>&1 | ForEach-Object {
+        # See the restore tee above: -LiteralPath avoids the bracket-path
+        # wildcard resolution that Tee-Object -FilePath would apply.
+        Add-Content -LiteralPath $logPath -Value $_
+        $_
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Native AOT retail publish failed. See '$logPath'."
     }
@@ -345,7 +360,7 @@ foreach ($pdb in $pdbFiles) {
     Assert-PathInsideRoot -Root $publishDir -Candidate $pdb.FullName
     $relativePath = $pdb.FullName.Substring($publishDir.TrimEnd('\', '/').Length + 1)
     $destination = Join-Path $symbolsDir $relativePath
-    New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
+    [System.IO.Directory]::CreateDirectory((Split-Path -Parent $destination)) | Out-Null
     Move-Item -LiteralPath $pdb.FullName -Destination $destination -Force
 }
 
