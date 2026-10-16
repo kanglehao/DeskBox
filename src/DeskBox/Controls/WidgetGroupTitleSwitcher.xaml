@@ -233,12 +233,12 @@
                              Keep the native template, including its joined lower corners. -->
                         <ResourceDictionary x:Key="Default">
                             <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="Transparent" />
-                            <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.09" />
+                            <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.16" />
                             <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.045" />
                             <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.03" />
                             <SolidColorBrush x:Key="TabViewItemHeaderBackgroundDisabled" Color="Transparent" />
                             <SolidColorBrush x:Key="TabViewBorderBrush" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.10" />
-                            <SolidColorBrush x:Key="TabViewItemSeparator" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.08" />
+                            <SolidColorBrush x:Key="TabViewItemSeparator" Color="{ThemeResource TextFillColorPrimary}" Opacity="0.30" />
                             <LinearGradientBrush x:Key="TabViewSelectedItemBorderBrush" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,4" Opacity="0.10">
                                 <LinearGradientBrush.RelativeTransform>
                                     <ScaleTransform ScaleY="-1" CenterY="0.5" />
@@ -281,6 +281,12 @@
                     <x:Double x:Key="TabViewItemMinWidth">32</x:Double>
                     <x:Double x:Key="TabViewItemMaxWidth">180</x:Double>
                     <x:Double x:Key="TabViewItemMinHeight">32</x:Double>
+                    <!-- The header keeps a slot for the native icon source that
+                         DeskBox never sets, and that slot's 10px margin is taken
+                         from the name. The template reads this one through a
+                         runtime ThemeResource lookup, so unlike the header
+                         padding it can be overridden from here. -->
+                    <Thickness x:Key="TabViewItemHeaderIconMargin">0,0,0,0</Thickness>
                 </ResourceDictionary>
             </TabView.Resources>
         </TabView>

@@ -17,7 +17,7 @@ public sealed partial class WidgetGroupTitleSwitcher
 {
     private readonly Dictionary<string, GroupTab> _tabs = new(StringComparer.Ordinal);
     private readonly WidgetGroupTabSelectionState _tabSelection = new();
-    private double _inactiveTabHeaderOpacity = 0.65;
+    private double _inactiveTabTitleOpacity = 0.8;
     private bool _isSynchronizingTabs;
     private bool _isSavingTabOrder;
     private bool _tabPointerDown;
@@ -30,6 +30,14 @@ public sealed partial class WidgetGroupTitleSwitcher
     private bool _isFileDragStripFreeze;
     private int _fileDragFreezeExitGeneration;
 
+    // Display-mode intent versus what the strip actually applies: the width
+    // pass may drop the icon slot when the tabs get too narrow, so the
+    // mode-derived visibility alone cannot be the source of truth.
+    private bool _titleShowsIcon = true;
+    private bool _titleShowsText = true;
+    private bool _tabIconSlotApplied = true;
+    private double _lastAvailableWidth;
+
     // Chrome/Edge and VS Code both dwell 500ms before a drag-hover tab
     // switch; Win11 Explorer takes 1-2s. 400ms keeps DeskBox snappier than
     // the browsers while giving the frozen strip a stable, deliberate
@@ -38,12 +46,46 @@ public sealed partial class WidgetGroupTitleSwitcher
 
     // The strip presents every member at once, so each tab's outer width is
     // forced to one shared value that divides the available title-bar width.
-    // The reserve covers the native TabView's leading slot and trailing gap;
-    // the title inset is what a tab's own chrome (icon + padding) consumes.
+    // The reserve covers the native TabView's leading slot and trailing gap.
     private const double TabStripChromeReserve = 16;
-    private const double TabTitleChromeInset = 30;
     private const double MinimumUniformTabWidth = 32;
     private const double MaximumUniformTabWidth = 180;
+    // The native header keeps a close button's clearance - 8px on each side -
+    // even though DeskBox never closes a tab. That thickness comes from a
+    // template visual-state setter whose value is a framework-scope
+    // StaticResource, so no resource override in this scope reaches it and it
+    // re-applies on every state transition; writing the padding from code only
+    // wins until the next state application, and the layout that follows still
+    // measures the framework value. The header grid therefore cancels the
+    // reserve with its own negative margin, which no template state targets.
+    // Keep this in step with TabViewItemHeaderPaddingWithoutCloseButton.
+    private const double TabNativeHeaderInset = 8;
+    private const double TabIconTextGap = 8;
+    // The title is the priority: the icon only keeps its slot while the tab
+    // can still show this much of the name beside it. Below that the whole
+    // group drops the icon together, so the names stay legible instead of
+    // collapsing into an ellipsis.
+    private const double MinimumTabTextWidth = 40;
+
+    // Each member keeps one stable hue, so the strip reads as a set of
+    // colour-coded tabs instead of one undifferentiated row of identical
+    // chips. The accents are Fluent's own; the fill is washed back to a
+    // translucent tint so the widget material still shows through.
+    private const byte TabTintAlpha = 0x4D;
+    private static readonly SolidColorBrush[] TabTintBrushes = CreateTabTints(
+        new (byte R, byte G, byte B)[]
+        {
+            (0x00, 0x78, 0xD4), // blue
+            (0xC2, 0x39, 0xB3), // magenta
+            (0x10, 0x7C, 0x10), // green
+            (0xCA, 0x50, 0x10), // orange
+            (0x87, 0x64, 0xB8), // purple
+            (0x03, 0x83, 0x87), // teal
+            (0xD1, 0x34, 0x38), // red
+            (0x98, 0x6F, 0x0B), // gold
+        });
+    // System high contrast owns the tab surfaces; the tints stand down there.
+    private bool _tabTintSuppressed;
 
     private bool UsesTabs => true;
 
@@ -65,7 +107,12 @@ public sealed partial class WidgetGroupTitleSwitcher
             "TabViewItemHeaderForegroundPressed", "TabViewScrollButtonForeground",
             "TabViewScrollButtonForegroundPressed");
         SetColor(disabled, "TabViewItemHeaderForegroundDisabled", "TabViewScrollButtonForegroundDisabled");
-        _inactiveTabHeaderOpacity = highContrast ? 1 : 0.65;
+        _inactiveTabTitleOpacity = highContrast ? 1 : 0.8;
+        if (_tabTintSuppressed != highContrast)
+        {
+            _tabTintSuppressed = highContrast;
+            ApplyTabTints();
+        }
         UpdateTabHeaderOpacity();
 
         void SetColor(Windows.UI.Color color, params string[] keys)
@@ -81,12 +128,76 @@ public sealed partial class WidgetGroupTitleSwitcher
     {
         foreach (GroupTab row in _tabs.Values)
         {
-            if (row.Tab.Header is UIElement header)
+            // Dim the name, not the whole header. The member tint keeps its
+            // full strength, so colour stays the fastest way to tell the tabs
+            // apart, and the inactive names only lose a little contrast - the
+            // tabs are too narrow to afford fading the text out much further.
+            double opacity = ReferenceEquals(TabsView.SelectedItem, row.Tab)
+                ? 1 : _inactiveTabTitleOpacity;
+            row.Title.Opacity = opacity;
+            row.Icon.Opacity = opacity;
+        }
+    }
+
+    private static SolidColorBrush[] CreateTabTints((byte R, byte G, byte B)[] accents)
+    {
+        var brushes = new SolidColorBrush[accents.Length];
+        for (int index = 0; index < accents.Length; index++)
+        {
+            brushes[index] = new SolidColorBrush(Windows.UI.Color.FromArgb(
+                TabTintAlpha, accents[index].R, accents[index].G, accents[index].B));
+        }
+        return brushes;
+    }
+
+    /// <summary>
+    /// Gives every member of the current group its own tint on the header
+    /// surface DeskBox owns, which the native template cannot repaint. The hue
+    /// follows the member id, so a tab keeps its colour across reorders and
+    /// restarts; when two ids land on the same entry the later one takes the
+    /// next free slot, keeping one group free of duplicate colours.
+    /// </summary>
+    private void ApplyTabTints()
+    {
+        if (_presentation is null || _tabs.Count == 0)
+        {
+            return;
+        }
+
+        var taken = new HashSet<int>();
+        foreach (WidgetGroupMemberPresentation member in _presentation.Members)
+        {
+            if (!_tabs.TryGetValue(member.WidgetId, out GroupTab? row) ||
+                row.Tab.Header is not Grid header)
             {
-                header.Opacity = ReferenceEquals(TabsView.SelectedItem, row.Tab)
-                    ? 1 : _inactiveTabHeaderOpacity;
+                continue;
+            }
+
+            SolidColorBrush? tint = _tabTintSuppressed
+                ? null
+                : TabTintBrushes[ResolveTabTintIndex(member.WidgetId, taken)];
+            if (!ReferenceEquals(header.Background, tint))
+            {
+                header.Background = tint;
             }
         }
+    }
+
+    private static int ResolveTabTintIndex(string memberId, HashSet<int> taken)
+    {
+        uint hash = 2166136261;
+        foreach (char character in memberId)
+        {
+            hash = (hash ^ character) * 16777619;
+        }
+
+        int index = (int)(hash % (uint)TabTintBrushes.Length);
+        for (int step = 0; step < TabTintBrushes.Length - 1 && taken.Contains(index); step++)
+        {
+            index = (index + 1) % TabTintBrushes.Length;
+        }
+        taken.Add(index);
+        return index;
     }
 
     private void RegisterTabPointerHandlers()
@@ -180,7 +291,7 @@ public sealed partial class WidgetGroupTitleSwitcher
                 row.Icon.IconSize = IconSize;
                 row.Icon.Visibility = showIcon ? Visibility.Visible : Visibility.Collapsed;
                 row.Icon.Margin = showIcon && showText
-                    ? new Thickness(0, 0, 8, 0)
+                    ? new Thickness(0, 0, TabIconTextGap, 0)
                     : new Thickness(0);
                 row.Title.Text = member.Name;
                 row.Title.FontSize = CurrentTitle.FontSize;
@@ -190,6 +301,13 @@ public sealed partial class WidgetGroupTitleSwitcher
                 AutomationProperties.SetPositionInSet(row.Tab, index + 1);
                 AutomationProperties.SetSizeOfSet(row.Tab, _presentation.Members.Count);
             }
+            // Record what the mode-derived chrome just applied to every row.
+            // UpdateUniformTabWidth may override it once the real strip width
+            // is known, and it must only react to an actual change.
+            _titleShowsIcon = showIcon;
+            _titleShowsText = showText;
+            _tabIconSlotApplied = showIcon;
+            ApplyTabTints();
             string selectedId = _tabSelection.ResolveSelection(
                 _presentation.GroupId, _presentation.ActiveMemberId, memberIds);
             TabsView.SelectedItem = _tabs.TryGetValue(selectedId, out GroupTab? selected)
@@ -215,6 +333,10 @@ public sealed partial class WidgetGroupTitleSwitcher
     /// by the member count and is clamped so a single member never grows past
     /// the former maximum and a crowded group never collapses past the former
     /// minimum. Local Min/Max win over the TabViewItem style setters.
+    /// The shared width also decides whether the group can afford the icon
+    /// slot: once the glyph plus a readable slice of the name no longer fit,
+    /// every tab drops its icon together, so the names stay visible and all
+    /// titles still measure the same.
     /// </summary>
     private void UpdateUniformTabWidth()
     {
@@ -224,8 +346,18 @@ public sealed partial class WidgetGroupTitleSwitcher
             return;
         }
 
-        double available = TabsView.ActualWidth -
-            TabsView.Margin.Left - TabsView.Margin.Right - TabStripChromeReserve;
+        // A re-sync can run before the strip has a width again, and TabsView's
+        // SizeChanged only fires when that width actually changes - so falling
+        // back to the last measured width keeps the icon decision applying,
+        // instead of leaving the mode-derived icon slot in place until a later
+        // resize that may never come.
+        double available = _lastAvailableWidth;
+        if (TabsView.ActualWidth > 0)
+        {
+            available = TabsView.ActualWidth -
+                TabsView.Margin.Left - TabsView.Margin.Right - TabStripChromeReserve;
+            _lastAvailableWidth = available;
+        }
         if (available <= 0)
         {
             // Not laid out yet; SizeChanged re-runs this with a real width.
@@ -236,7 +368,33 @@ public sealed partial class WidgetGroupTitleSwitcher
             available / count,
             MinimumUniformTabWidth,
             MaximumUniformTabWidth);
-        double titleWidth = Math.Max(12, uniform - TabTitleChromeInset);
+
+        // One group-wide decision: a per-tab budget would let one member keep
+        // its icon while another lost it, breaking the shared title length.
+        // The icon has to earn its slot: once the glyph and its gap are paid
+        // for, the shared width must still leave a readable slice of the name.
+        // Otherwise every tab drops the icon together.
+        bool showIcon = _titleShowsIcon &&
+            uniform - (IconSize + TabIconTextGap) >= MinimumTabTextWidth;
+        bool showText = _titleShowsText || !showIcon;
+        if (showIcon != _tabIconSlotApplied)
+        {
+            _tabIconSlotApplied = showIcon;
+            var iconMargin = new Thickness(0, 0, showIcon ? TabIconTextGap : 0, 0);
+            foreach (GroupTab row in _tabs.Values)
+            {
+                row.Icon.Visibility = showIcon ? Visibility.Visible : Visibility.Collapsed;
+                row.Icon.Margin = showIcon && showText ? iconMargin : new Thickness(0);
+                row.Title.Visibility = showText ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        // The header grid already cancelled the native padding, so the name
+        // only pays for the icon slot while the icon is shown; without the icon
+        // the freed slot goes to the text.
+        double titleWidth = Math.Max(
+            MinimumTabTextWidth,
+            uniform - (showIcon ? IconSize + TabIconTextGap : 0));
         foreach (GroupTab row in _tabs.Values)
         {
             row.Tab.MinWidth = uniform;
@@ -267,9 +425,16 @@ public sealed partial class WidgetGroupTitleSwitcher
             Visibility = Visibility.Collapsed,
             IsHitTestVisible = false
         };
+        // The native header spends 8px per side on close-button clearance that
+        // DeskBox never uses, and no resource in this scope can take it back
+        // (see TabNativeHeaderInset). The grid cancels it with its own negative
+        // margin and fills the tab, so the tint covers the whole tab surface
+        // while the icon and name stay centred inside it.
         var header = new Grid
         {
-            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Margin = new Thickness(-TabNativeHeaderInset, 0, -TabNativeHeaderInset, 0),
             MinHeight = 24
         };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -286,7 +451,8 @@ public sealed partial class WidgetGroupTitleSwitcher
             Tag = memberId,
             IsClosable = false,
             MinHeight = _titleBarContentHeight,
-            VerticalContentAlignment = VerticalAlignment.Center,
+            HorizontalContentAlignment = HorizontalAlignment.Stretch,
+            VerticalContentAlignment = VerticalAlignment.Stretch,
             // Native TabView drag lookup falls back to the item's Content.
             // Null content makes every header resolve to the first tab. Keep
             // a distinct, zero-height placeholder; DeskBox owns real content.
