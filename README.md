@@ -6,14 +6,13 @@ English | [简体中文](README.zh-CN.md)
 
 > External pull requests are not being merged at this time — bug reports, ideas, and discussions are very welcome via Issues / Discussions. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-[![CI](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml)
+[![CI](https://github.com/kanglehao/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/kanglehao/DeskBox/actions/workflows/ci.yml)
 [![Release 1.5.10](https://img.shields.io/badge/release-1.5.10-2563EB.svg)](https://github.com/kanglehao/DeskBox/releases/tag/v1.5.10)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%2F11-0078D4.svg)](#system-requirements)
 [![x64 and ARM64](https://img.shields.io/badge/architecture-x64%20%7C%20ARM64-5C2D91.svg)](#download)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Tianyu199509/DeskBox?style=flat&color=yellow)](https://github.com/Tianyu199509/DeskBox/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/Tianyu199509/DeskBox/total?style=flat&color=brightgreen)](https://github.com/Tianyu199509/DeskBox/releases)
-<a href="https://hellogithub.com/repository/Tianyu199509/DeskBox" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=f0cae3cb81f3496b9b6ead91194dc6f8&claim_uid=x4er8iQsXYT3aMN&theme=small" alt="Featured｜HelloGitHub" /></a>
+[![GitHub stars](https://img.shields.io/github/stars/kanglehao/DeskBox?style=flat&color=yellow)](https://github.com/kanglehao/DeskBox/stargazers)
+[![Downloads](https://img.shields.io/github/downloads/kanglehao/DeskBox/total?style=flat&color=brightgreen)](https://github.com/kanglehao/DeskBox/releases)
 
 ![DeskBox Windows desktop organizer with file, todo, search, weather, and music widgets](docs/images/brand/readme-hero-1-3-7-dark-en.png)
 
@@ -299,16 +298,16 @@ docs\releases               release copy and test checklists
 
 ## Feedback and localization
 
-DeskBox is currently developed and maintained by a solo developer. External pull requests are not being accepted at this stage so the project can keep a consistent architecture and clear copyright boundaries, but bug reports, feature requests, translations, and UI/UX feedback are welcome through [GitHub Issues](https://github.com/Tianyu199509/DeskBox/issues).
+DeskBox is currently developed and maintained by a solo developer. External pull requests are not being accepted at this stage so the project can keep a consistent architecture and clear copyright boundaries, but bug reports, feature requests, translations, and UI/UX feedback are welcome through [GitHub Issues](https://github.com/kanglehao/DeskBox/issues).
 
 Special thanks to [@magisph](https://github.com/magisph) for the Brazilian Portuguese localization.
 
-You can also visit [deskbox.fun](https://deskbox.fun) or use the contact information in the app's About page.
+This repository is a customized build of DeskBox; the upstream project is at <https://github.com/Tianyu199509/DeskBox>.
 
 ## Author and license
 
-- Developer: Tianyu Zhu
-- Repository: <https://github.com/Tianyu199509/DeskBox>
+- Original project: Tianyu Zhu — <https://github.com/Tianyu199509/DeskBox>
+- Customized build maintained by: kanglehao — <https://github.com/kanglehao/DeskBox>
 - License: [GPL-3.0-only](LICENSE)
 
 Earlier DeskBox versions already published under the MIT License remain available under that license. The change is not retroactive.
@@ -318,4 +317,4 @@ Earlier DeskBox versions already published under the MIT License remain availabl
 
 If DeskBox helps you, a star ⭐ is a big encouragement for this solo project.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Tianyu199509/DeskBox&type=Date)](https://star-history.com/#Tianyu199509/DeskBox&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=kanglehao/DeskBox&type=Date)](https://star-history.com/#kanglehao/DeskBox&Date)

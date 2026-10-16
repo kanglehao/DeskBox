@@ -6,14 +6,13 @@
 
 > 目前暂不接受外部 PR 合并——欢迎通过 Issue / Discussion 提交 Bug、功能建议与技术讨论，详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-[![CI](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianyu199509/DeskBox/actions/workflows/ci.yml)
+[![CI](https://github.com/kanglehao/DeskBox/actions/workflows/ci.yml/badge.svg)](https://github.com/kanglehao/DeskBox/actions/workflows/ci.yml)
 [![1.5.10 版本](https://img.shields.io/badge/release-1.5.10-2563EB.svg)](https://github.com/kanglehao/DeskBox/releases/tag/v1.5.10)
 [![Windows 10/11](https://img.shields.io/badge/Windows-10%2F11-0078D4.svg)](#环境要求)
 [![x64 and ARM64](https://img.shields.io/badge/architecture-x64%20%7C%20ARM64-5C2D91.svg)](#下载)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Tianyu199509/DeskBox?style=flat&color=yellow)](https://github.com/Tianyu199509/DeskBox/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/Tianyu199509/DeskBox/total?style=flat&color=brightgreen)](https://github.com/Tianyu199509/DeskBox/releases)
-<a href="https://hellogithub.com/repository/Tianyu199509/DeskBox" target="_blank"><img src="https://api.hellogithub.com/v1/widgets/recommend.svg?rid=f0cae3cb81f3496b9b6ead91194dc6f8&claim_uid=x4er8iQsXYT3aMN&theme=small" alt="Featured｜HelloGitHub" /></a>
+[![GitHub stars](https://img.shields.io/github/stars/kanglehao/DeskBox?style=flat&color=yellow)](https://github.com/kanglehao/DeskBox/stargazers)
+[![Downloads](https://img.shields.io/github/downloads/kanglehao/DeskBox/total?style=flat&color=brightgreen)](https://github.com/kanglehao/DeskBox/releases)
 
 ![DeskBox Windows 桌面整理工具，包含文件、待办、搜索、天气和音乐格子](docs/images/brand/readme-hero-1-3-7-dark-zh-cn.png)
 
@@ -297,16 +296,16 @@ docs\releases               版本发布文案和测试清单
 
 ## 反馈与本地化
 
-DeskBox 目前由个人独立开发和维护。为了保持架构一致性与后续版权边界，现阶段暂不接受外部 Pull Request；欢迎通过 [GitHub Issues](https://github.com/Tianyu199509/DeskBox/issues) 提交问题、功能建议、翻译和 UI/UX 反馈。
+DeskBox 目前由个人独立开发和维护。为了保持架构一致性与后续版权边界，现阶段暂不接受外部 Pull Request；欢迎通过 [GitHub Issues](https://github.com/kanglehao/DeskBox/issues) 提交问题、功能建议、翻译和 UI/UX 反馈。
 
 特别感谢 [@magisph](https://github.com/magisph) 提供巴西葡萄牙语本地化支持。
 
-也可以访问 [deskbox.fun](https://deskbox.fun)，或通过应用“关于”页面中的联系方式反馈。
+本仓库是 DeskBox 的定制版，上游项目地址：<https://github.com/Tianyu199509/DeskBox>。
 
 ## 作者与协议
 
-- 开发者：朱天雨
-- 项目地址：<https://github.com/Tianyu199509/DeskBox>
+- 上游项目：朱天雨 — <https://github.com/Tianyu199509/DeskBox>
+- 本定制版维护：kanglehao — <https://github.com/kanglehao/DeskBox>
 - 开源协议：[GPL-3.0-only](LICENSE)
 
 早期已按 MIT 协议发布的 DeskBox 版本继续保持原许可，协议变更不追溯历史版本。
@@ -315,4 +314,4 @@ DeskBox 目前由个人独立开发和维护。为了保持架构一致性与后
 
 如果 DeskBox 对你有帮助，欢迎点一个 Star ⭐，这是对这个独立项目最大的鼓励。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Tianyu199509/DeskBox&type=Date)](https://star-history.com/#Tianyu199509/DeskBox&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=kanglehao/DeskBox&type=Date)](https://star-history.com/#kanglehao/DeskBox&Date)
